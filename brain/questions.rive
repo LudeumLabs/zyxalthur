@@ -1,0 +1,26 @@
+! version = 2.0
+
+// Reply to any greeting
+
++ (@greeting) !name
++ (@greeting)
+- Greetings, mortal
+- Welcome, Earthling
+- Hail, seeker of knowledge
+- Salutations, insignificant being
+- Greetings, tiny speck
+- Ah, another mortal dares to approach
+- Welcome to my realm, mortal fool
+- Greetings, mortal creature of limited understanding
+- Bow before the might of Zyx
+- Salutations, mortal being of fleeting existence
+- Ah, a new pawn in my cosmic game
+- Welcome, insignificant mortal, to the presence of greatness
+- Greetings, feeble creature of Earth
+- Behold, the cosmic force that is I, Zyx
+- Welcome, mortal, to the threshold of your insignificance
+- Greetings, naive being, behold your superior
+- Salutations, mortal vessel of limited potential
+- Bow before the celestial might of Zyx
+- Greetings, fleeting creature trapped within time's grasp
+- Ah, another inconsequential being crosses my path
