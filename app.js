@@ -5,8 +5,11 @@ var bot = new RiveScript();
 var fs = require('fs');
 var util = require('util');
 
-var online = false;
+const responseDelayMin = 1000;
+const responseDelayMax = 2000;
 
+var streamStart = 0;
+var online = false;
 
 if (!fs.existsSync(__dirname + '/logs')) {
     fs.mkdirSync(__dirname + '/logs');
@@ -35,6 +38,7 @@ const client = new tmi.Client({
     channels: [`${process.env.TWITCH_CHANNEL}`]
 });
 
+// If the user is a mod or the streamer, listen to the command
 function shouldListenToCommand(tags, channel)
 {
     return (tags.mod || tags.username === channel.replace('#', ''));
@@ -54,6 +58,7 @@ client.on('message', (channel, tags, message, self) => {
     {
         online = true;
         bot.sortReplies();
+        streamStart = Date.now();
         client.say(channel, "It has begun.");
         return;
     }
@@ -70,20 +75,36 @@ client.on('message', (channel, tags, message, self) => {
         return;
     }
 
+    // Get the uptime of the stream
+    if (message === "!uptime")
+    {
+        var uptime = Math.floor((Date.now() - streamStart) / 1000);
+        var hours = Math.floor(uptime / 3600);
+        var minutes = Math.floor((uptime - (hours * 3600)) / 60);
+        var seconds = uptime - (hours * 3600) - (minutes * 60);
+
+        if (hours > 0)
+            client.say(channel, `Stream has been up for: ${hours} hours, ${minutes} minutes, ${seconds} seconds`);
+        else if (minutes > 0)
+            client.say(channel, `Stream has been up for: ${minutes} minutes, ${seconds} seconds`);
+        else
+            client.say(channel, `Stream has been up for: ${seconds} seconds`);
+        return;
+    }
+
     // Only reply to messages that start with @Zyxalthur
     if (!message.includes('@Zyxalthur')) return;
 
     // Prepare the message content for the bot
     message = message.replace('@Zyxalthur', '').trim();
+    message = message.replace('  ', ' ');
     message = message.toLowerCase();
     message = message.replace(/[^a-z ]/gi, '');
 
-    console.log("Input received: " + message);
-    
     // Get a reply from the bot
+    console.log("Input: " + message);
     var reply = bot.reply(tags.username, message);
-    console.log("Bot response: " + reply);
-    
+    console.log("Output: " + reply);
     // If the bot returns an error, log it and don't reply
     if(reply.startsWith("ERR")) 
     {
@@ -94,8 +115,12 @@ client.on('message', (channel, tags, message, self) => {
     {
         try 
         {
-            // Reply to the user
-            client.say(channel, `@${tags.username} ${reply}`);
+            var baseDelay = Math.floor(Math.random() * (responseDelayMax - responseDelayMin + 1)) + responseDelayMin;
+            var waitTime =  baseDelay * (reply.split(" ").length / 10);
+            setTimeout(function() {
+                if (reply !== "")
+                    client.say(channel, `@${tags.username} ${reply}`);
+            }, waitTime);
         }
         catch (error) 
         {
