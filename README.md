@@ -1,4 +1,4 @@
-# Zyxal'thur
+# Lord Zyxal'thur, the Celestial Conqueror
 
 ![Zyxal'thur](img/zyx.png)
 
