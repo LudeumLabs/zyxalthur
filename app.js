@@ -4,16 +4,17 @@ var RiveScript = require("rivescript");
 var bot = new RiveScript();
 var fs = require('fs');
 var util = require('util');
-const { timeStamp } = require('console');
 
-// create logs directory
+var online = false;
+
+
 if (!fs.existsSync(__dirname + '/logs')) {
     fs.mkdirSync(__dirname + '/logs');
 }
 var log_file = fs.createWriteStream(__dirname + `/logs/session_${Date.now()}.log`, {flags : 'w'});
 var log_stdout = process.stdout;
 
-console.log = function(d) { //
+console.log = function(d) {
   log_file.write(util.format(d) + '\n');
   log_stdout.write(util.format(d) + '\n');
 };
@@ -34,45 +35,73 @@ const client = new tmi.Client({
     channels: [`${process.env.TWITCH_CHANNEL}`]
 });
 
-client.connect().catch(console.error);
+function shouldListenToCommand(tags, channel)
+{
+    return (tags.mod || tags.username === channel.replace('#', ''));
+}
+
+client.connect().then((data) => {
+    console.log(`Connected to ${data[0]}:${data[1]}`);
+}).catch(console.error);
+
 
 client.on('message', (channel, tags, message, self) => {
+    // Ignore echoed messages.
     if (self) return;
+
+    // Turn on the bot when the streamer or a mod types !streamon
+    if (message === "!streamon"  && !online && shouldListenToCommand(tags, channel))
+    {
+        online = true;
+        bot.sortReplies();
+        client.say(channel, "It has begun.");
+        return;
+    }
+    
+    // Don't listen to commands or messages if the bot is offline
+    if (!online) return;
+    
+    // Turn off the bot when the streamer or a mod types !streamoff
+    if (message === "!streamoff" && shouldListenToCommand(tags, channel))
+    {
+        online = false;
+        client.say(channel, "It is finished.");
+        client.disconnect();
+        return;
+    }
+
+    // Only reply to messages that start with @Zyxalthur
     if (!message.includes('@Zyxalthur')) return;
 
+    // Prepare the message content for the bot
     message = message.replace('@Zyxalthur', '').trim();
     message = message.toLowerCase();
-    message = message.replace(/[^a-z ]/gi, '')
-    
-    bot.sortReplies();
+    message = message.replace(/[^a-z ]/gi, '');
 
     console.log("Input received: " + message);
-
+    
+    // Get a reply from the bot
     var reply = bot.reply(tags.username, message);
     console.log("Bot response: " + reply);
-
-    if(reply.startsWith("ERR")) {
-        console.log(reply);
+    
+    // If the bot returns an error, log it and don't reply
+    if(reply.startsWith("ERR")) 
+    {
+        console.error(reply);
         return;
-    } 
-
+    }
     else 
     {
         try 
         {
+            // Reply to the user
             client.say(channel, `@${tags.username} ${reply}`);
         }
-
         catch (error) 
         {
             console.error(error);
         }
     }
-});
-
-client.on("connected", (address, port) => {
-    console.log(`Connected to ${address}:${port}`);
-    client.say(`${process.env.TWITCH_CHANNEL}`, "Behold, I am alive!");
 });
 
 client.on("ping", () => {
