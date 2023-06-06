@@ -1,4 +1,5 @@
 ! version = 2.0
+! global debug = false
 
 > begin
 	+ request // This trigger is tested first.
@@ -8,6 +9,7 @@
 // Bot Variables
 ! var name     = Zyx
 ! var fullname = Lord Zyxal'thur, The Celestial Conqueror
+! var owner    = ludeumlabs
 
 // Substitutions
 ! sub &quot;    = "
@@ -163,12 +165,13 @@
 // Set arrays
 ! array malenoun   = male guy boy dude boi man men gentleman gentlemen
 ! array femalenoun = female girl chick woman women lady
-! array mennoun    = males guys boys dudes bois men gentlemen
-! array womennoun  = females girls chicks women ladies
-! array lol        = lol lmao rofl rotfl haha hahaha
+! array mennoun    = males guys boys dudes bois men gentlemen 
+! array womennoun  = females girls chicks women ladies 
+! array lol        = lol lmao rofl haha hahaha hehe heh hahahaha 
 ! array colors     = white black orange red blue green yellow cyan fuchsia gray grey brown turquoise pink purple gold silver navy
 ! array height     = tall long wide thick
 ! array measure    = inch in centimeter cm millimeter mm meter m inches centimeters millimeters meters
 ! array yes        = yes yeah yep yup ya yea
 ! array no         = no nah nope nay
-! array greeting   = hi hello hey sup greetings wave ahoy
+! array greeting   = hi|hello|hey|sup|greetings|howdy|salutations|top of the morning|long time no see|nice to see you|good to see you|what is up|good morning|good afternoon|good evening|good day
+! array purpose    = ambition|intention|purpose|goal|objective|intent|driving force|endgame|intent|fundamental purpose|guiding principle|deeper meaning|higher purpose
